@@ -25,3 +25,7 @@ odin/wasm  23,000     ~20 (24,000)
 go/wasm    24,000     ~30 (25,000)
 rust/wasm  24,000     ~30 (25,000)
 ```
+
+## License
+
+Public Domain

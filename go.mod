@@ -1,4 +1,4 @@
-module github.com/judah-caruso/wasm-engine-test
+module github.com/judah-caruso/wasm-game-engine-test
 
 go 1.21.0
 
