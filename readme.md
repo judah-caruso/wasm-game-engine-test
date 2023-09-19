@@ -4,6 +4,8 @@ This repository was created to see how feasible it is to use [wazero](https://wa
 
 If you're trying to do something similar, hopefully this provides a decent starting point.
 
+![](screenshot.png)
+
 ## Installation
 
 - Install the toolchain for the language you want to compile (zig, rust, odin, tinygo, assemblyscript)
