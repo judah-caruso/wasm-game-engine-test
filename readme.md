@@ -1,6 +1,6 @@
 # Wasm Game Engine Test
 
-This repository was created to see how feasible it is to use [wazero](https://wazero.io/) to drive a small game engine (using [Ebitengen](https://ebitengine.org/)). It simply sets up Ebitengen and exports a small api for wasm to import.
+This repository was created to see how feasible it is to use [wazero](https://wazero.io/) to drive a small game engine (using [Ebitengine](https://ebitengine.org/)). It simply sets up Ebitengine and exports a small api for wasm to import.
 
 If you're trying to do something similar, hopefully this provides a decent starting point.
 
