@@ -158,7 +158,7 @@ pub extern "C" fn teardown() {
 }
 
 #[no_mangle]
-pub extern "C" fn frame() {
+pub extern "C" fn update() {
     if input::pressed(1) {
         engine::exit();
     }
@@ -181,13 +181,6 @@ pub extern "C" fn frame() {
             GOPHERS.extend(to_add);
         }
     }
-
-    gfx::clear(Color {
-        r: 0.19,
-        g: 0.19,
-        b: 0.19,
-        a: 1.0,
-    });
 
     const SW: f32 = 640.0;
     const SH: f32 = 480.0;
@@ -212,14 +205,24 @@ pub extern "C" fn frame() {
             } else if g.pos.x < 0.0 {
                 g.vel.x = g.vel.x.abs();
             }
+        }
+    }
+}
 
+#[no_mangle]
+pub extern "C" fn render() {
+    gfx::clear(Color {
+        r: 0.19,
+        g: 0.19,
+        b: 0.19,
+        a: 1.0,
+    });
+
+    unsafe {
+        for g in GOPHERS.iter() {
             gfx::image(g.pos.x, g.pos.y, g.color);
         }
     }
-
-    let fps = format!("fps: {}", engine::fps());
-    let tps = format!("tps: {}", engine::tps());
-    let gophers = format!("gophers: {}", unsafe { GOPHERS.len() });
 
     gfx::rectangle(
         10.0,
@@ -233,6 +236,10 @@ pub extern "C" fn frame() {
             a: 0.5,
         },
     );
+
+    let fps = format!("fps: {}", engine::fps());
+    let tps = format!("tps: {}", engine::tps());
+    let gophers = format!("gophers: {}", unsafe { GOPHERS.len() });
 
     gfx::text("lang: rust", 10.0, 10.0);
     gfx::text(fps.as_str(), 10.0, 24.0);

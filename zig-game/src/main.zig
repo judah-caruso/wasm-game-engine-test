@@ -128,7 +128,7 @@ export fn teardown() callconv(.C) void {
     tmp_arena.deinit();
 }
 
-export fn frame() callconv(.C) void {
+export fn update() callconv(.C) void {
     if (Input.pressed(1)) {
         Engine.exit();
         return;
@@ -157,8 +157,6 @@ export fn frame() callconv(.C) void {
         }
     }
 
-    Gfx.clear(.{ 0.19, 0.19, 0.19, 1 });
-
     for (gophers.items) |*g| {
         g.vy += gravity;
         g.px += g.vx;
@@ -178,7 +176,13 @@ export fn frame() callconv(.C) void {
         } else if (g.px < 0) {
             g.vx = math.fabs(g.vx);
         }
+    }
+}
 
+export fn render() callconv(.C) void {
+    Gfx.clear(.{ 0.19, 0.19, 0.19, 1 });
+
+    for (gophers.items) |g| {
         Gfx.image(g.px, g.py, g.c);
     }
 

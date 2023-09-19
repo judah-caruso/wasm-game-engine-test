@@ -55,8 +55,8 @@ func Teardown() {
 	EngineLog("Teardown")
 }
 
-//go:export frame
-func Frame() {
+//go:export update
+func Update() {
 	if InputPressed(1) {
 		EngineExit()
 		return
@@ -74,8 +74,6 @@ func Frame() {
 
 		gophers = append(gophers, toAdd[:]...)
 	}
-
-	gfxClear(Color{R: .19, G: .19, B: .19, A: 1})
 
 	for i := range gophers {
 		g := &gophers[i]
@@ -97,14 +95,21 @@ func Frame() {
 		} else if g.pos.X < 0 {
 			g.vel.X = float32(math.Abs(float64(g.vel.X)))
 		}
-
-		gfxImage(g.pos.X, g.pos.Y, g.col)
 	}
+}
 
+//go:export render
+func Render() {
 	var (
 		fps = EngineFps()
 		tps = EngineTps()
 	)
+
+	gfxClear(Color{R: .19, G: .19, B: .19, A: 1})
+
+	for _, g := range gophers {
+		gfxImage(g.pos.X, g.pos.Y, g.col)
+	}
 
 	gfxRectangle(10, 10, 125, 55, Color{R: 0, G: 0, B: 0, A: 0.5})
 

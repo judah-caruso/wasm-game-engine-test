@@ -124,7 +124,7 @@ setup :: proc "contextless" () {
 
 	err: mem.Allocator_Error
 
-	main_data, err = page_alloc(32)
+	main_data, err = page_alloc(128)
 	if err != .None {
 		engine_log("allocation main pages failed!")
 		engine_exit()
@@ -155,7 +155,7 @@ teardown :: proc "contextless" () {
 }
 
 @(export)
-frame :: proc "contextless" () {
+update :: proc "contextless" () {
 	context = wasm_ctx
 	// defer free_all(context.temp_allocator)
 
@@ -179,8 +179,6 @@ frame :: proc "contextless" () {
 		}
 	}
 
-	gfx_clear({.19, .19, .19, 1})
-
    for g in &gophers {
 		g.vel.y += GRAVITY
 		g.pos += g.vel
@@ -199,9 +197,18 @@ frame :: proc "contextless" () {
 		} else if g.pos.x < 0 {
 			g.vel.x = math.abs(g.vel.x)
 		}
-
-      gfx_image(g.pos.x, g.pos.y, g.color)
    }
+}
+
+@(export)
+render :: proc "contextless" () {
+	context = wasm_ctx
+
+	gfx_clear({.19, .19, .19, 1})
+
+	for g in gophers {
+      gfx_image(g.pos.x, g.pos.y, g.color)
+	}
 
 	gfx_rectangle(10, 10, 125, 55, { 0, 0, 0, 0.5 })
 	gfx_text("lang: odin", 10, 10)

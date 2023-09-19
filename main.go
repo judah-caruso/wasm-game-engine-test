@@ -38,7 +38,8 @@ type Game struct {
 
 	wasmFnSetup    api.Function
 	wasmFnTeardown api.Function
-	wasmFnFrame    api.Function
+	wasmFnUpdate   api.Function
+	wasmFnRender   api.Function
 	wasmStack      []uint64
 
 	setupRan   bool
@@ -105,7 +106,8 @@ func (g *Game) Setup() {
 	g.wasmStack = make([]uint64, 16)
 	g.wasmFnSetup = mod.ExportedFunction("setup")
 	g.wasmFnTeardown = mod.ExportedFunction("teardown")
-	g.wasmFnFrame = mod.ExportedFunction("frame")
+	g.wasmFnUpdate = mod.ExportedFunction("update")
+	g.wasmFnRender = mod.ExportedFunction("render")
 
 	g.renderWidth = 640
 	g.renderHeight = 480
@@ -146,7 +148,7 @@ func (g *Game) Update() error {
 		g.setupRan = true
 	}
 
-	g.WasmFrame()
+	g.WasmUpdate()
 	return nil
 }
 
@@ -156,6 +158,8 @@ func (g *Game) Draw(sc *eb.Image) {
 	// it will be for a frame or so. You'd also want to
 	// update all Gfx* procs to account for this.
 	if g.renderSource != nil {
+		g.WasmRender()
+
 		op := eb.DrawImageOptions{}
 		sc.DrawImage(g.renderSource, &op)
 	}
@@ -199,13 +203,25 @@ func (g *Game) WasmTeardown() {
 	}
 }
 
-func (g *Game) WasmFrame() {
-	if g.wasmFnFrame == nil {
+func (g *Game) WasmUpdate() {
+	if g.wasmFnUpdate == nil {
 		return
 	}
 
 	clear(g.wasmStack)
-	err := g.wasmFnFrame.CallWithStack(g.wasmCtx, g.wasmStack)
+	err := g.wasmFnUpdate.CallWithStack(g.wasmCtx, g.wasmStack)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func (g *Game) WasmRender() {
+	if g.wasmFnRender == nil {
+		return
+	}
+
+	clear(g.wasmStack)
+	err := g.wasmFnRender.CallWithStack(g.wasmCtx, g.wasmStack)
 	if err != nil {
 		log.Println(err)
 	}

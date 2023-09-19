@@ -49,7 +49,7 @@ export function teardown(): void {
   engineLog("teardown");
 };
 
-export function frame(): void {
+export function update(): void {
   if (inputPressed(1)) {
     engineExit();
     return;
@@ -66,10 +66,7 @@ export function frame(): void {
         color: colors[engineRandomInt(colors.length)]
       });
     }
-
   }
-
-  gfxClear({ r: 0.19, g: 0.19, b: 0.19, a: 1 });
 
   for (let i = 0; i < gophers.length; i += 1) {
     const g = gophers[i];
@@ -91,14 +88,21 @@ export function frame(): void {
     } else if (g.pos.x < 0) {
       g.vel.x = f32(Math.abs(g.vel.x));
     }
+  }
+};
 
+export function render(): void {
+  gfxClear({ r: 0.19, g: 0.19, b: 0.19, a: 1 });
+
+  for (let i = 0; i < gophers.length; i += 1) {
+    const g = gophers[i];
     gfxImage(g.pos.x, g.pos.y, g.color);
   }
 
+  gfxRectangle(10, 10, 125, 55, { r: 0, g: 0, b: 0, a: 0.5 });
+
   const fps = engineFps();
   const tps = engineTps();
-
-  gfxRectangle(10, 10, 125, 55, { r: 0, g: 0, b: 0, a: 0.5 });
 
   gfxText("lang: asc", 10, 10);
   gfxText(`fps: ${Math.round(fps * 100) / 100}`, 10, 24);
