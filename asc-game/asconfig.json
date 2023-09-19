@@ -1,0 +1,24 @@
+{
+  "entries": [
+    "./src/main.ts"
+  ],
+  "targets": {
+    "release": {
+      "optimizationLevel": 3,
+      "debug": true,
+      "shrinkLevel": 2,
+      "converge": true,
+      "noAssert": true,
+      "use": "abort="
+    }
+  },
+  "options": {
+    "outFile": "game.wasm",
+    "runtime": "incremental",
+    "noExportMemory": true,
+    "use": [
+      "trace=",
+      "seed=src/main/seedHandler"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+.DS_Store
+game.wasm
+rust-game/target/*
+rust-game/Cargo.lock
+zig-game/zig-cache/*
+zig-game/zig-out/*

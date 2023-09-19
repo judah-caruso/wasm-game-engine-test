@@ -1,0 +1,9 @@
+{
+  "name": "asc-game",
+  "scripts": {
+    "build": "asc --target release"
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.27.8"
+  }
+}
