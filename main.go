@@ -50,6 +50,17 @@ type Game struct {
 	opts eb.DrawImageOptions
 }
 
+func main() {
+	G.Setup()
+	defer G.Teardown()
+
+	eb.SetWindowResizingMode(eb.WindowResizingModeEnabled)
+
+	if err := eb.RunGame(&G); err != nil && err != errExit {
+		log.Fatal(err)
+	}
+}
+
 func (g *Game) Setup() {
 	wasmSrc, err := os.ReadFile("game.wasm")
 	if err != nil {
@@ -88,8 +99,9 @@ func (g *Game) Setup() {
 		log.Fatal(err)
 	}
 
-	// Since we're calling back and forth, setup consistent stack
-	// that we reset before each call (doesn't need to be 16 uint64s).
+	// Since we're calling between wasm and go a lot,
+	// setup a consistent stack that's reset before each call
+	// (doesn't need to be 16 uint64s)
 	g.wasmStack = make([]uint64, 16)
 	g.wasmFnSetup = mod.ExportedFunction("setup")
 	g.wasmFnTeardown = mod.ExportedFunction("teardown")
@@ -116,12 +128,13 @@ func (g *Game) Teardown() {
 }
 
 var (
-	// use for average frame time
-	start          time.Time
-	framesRendered int64 = 0
+	start          = time.Now()
+	framesRendered = 0 // used for average frame time
 
 	errExit = errors.New("exit")
 )
+
+// Eibtengen methods
 
 func (g *Game) Update() error {
 	if g.shouldQuit {
@@ -138,8 +151,10 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(sc *eb.Image) {
-	sc.Clear()
-
+	// As it is now, the render source will never be nil.
+	// However, if we add hotswapping there's a chance
+	// it will be for a frame or so. You'd also want to
+	// update all Gfx* procs to account for this.
 	if g.renderSource != nil {
 		op := eb.DrawImageOptions{}
 		sc.DrawImage(g.renderSource, &op)
@@ -147,9 +162,9 @@ func (g *Game) Draw(sc *eb.Image) {
 
 	framesRendered += 1
 	if framesRendered == 5 {
+		avg := time.Since(start).Seconds() / float64(framesRendered)
+		eb.SetWindowTitle(fmt.Sprintf("Wasm Game Engine Test - Avg Render Time: %.4f", avg))
 		framesRendered = 0
-		avg := time.Since(start).Seconds() / 5
-		eb.SetWindowTitle(fmt.Sprintf("Wasm Test - Avg Render Time: %.4f", avg))
 		start = time.Now()
 	}
 }
@@ -157,6 +172,8 @@ func (g *Game) Draw(sc *eb.Image) {
 func (g *Game) Layout(ww, wh int) (ow int, oh int) {
 	return g.renderWidth, g.renderHeight
 }
+
+// Simple wrappers to call into wasm.
 
 func (g *Game) WasmSetup() {
 	if g.wasmFnSetup == nil {
@@ -194,18 +211,7 @@ func (g *Game) WasmFrame() {
 	}
 }
 
-func main() {
-	G.Setup()
-	defer G.Teardown()
-
-	eb.SetWindowResizingMode(eb.WindowResizingModeEnabled)
-
-	start = time.Now()
-
-	if err := eb.RunGame(&G); err != nil && err != errExit {
-		log.Fatal(err)
-	}
-}
+// Exported api
 
 func engineLog(_ context.Context, m api.Module, offset, len uint32) {
 	buf, ok := m.Memory().Read(offset, len)
