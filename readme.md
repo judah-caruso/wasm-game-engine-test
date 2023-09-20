@@ -17,7 +17,7 @@ If you're trying to do something similar, hopefully this provides a decent start
 
 Below are a few grain-of-salt metrics I've gathered for each bunnymark-styled demo. This **isn't** intended to be a direct comparison of performance, more to see how much overhead there is when calling between wazero/wasm and go.
 
-Note: these are on a 2022 M2 MacBook Air (8GB)
+Note: these were ran on a 2022 M2 MacBook Air (8GB)
 
 ```
 Language  60 Fps Max  60 Tps Max (Avg. Fps)
@@ -35,7 +35,8 @@ Runtime        60 Fps Max  60 Tps Max (Avg. Fps)
 go/goja             2,000       3,000 (18)
 go/gopher-lua      13,000      22,000 (19)
 go/browser[1]      13,000      49,000 (14)
-go/native[2]       64,000     230,000 (14)
+go/native[2]       55,000     192,000 (15)
+go/native[3]       64,000     230,000 (14)
 ```
 
 - 60 Fps Max: number of entities before consistent fps is below 60
@@ -43,7 +44,8 @@ go/native[2]       64,000     230,000 (14)
 - Avg. Fps: average fps when tps is passed tps max
 
 1. [Ebitengine Sprites Example](https://ebitengine.org/en/examples/sprites.html)
-2. [Gophermark](https://github.com/judah-caruso/gophermark)
+2. [Ebitengine Bunnymark](https://github.com/sedyh/ebitengine-bunny-mark)
+3. [Gophermark](https://github.com/judah-caruso/gophermark)
 
 From my tests, embedding wasm/wazero within a native go application
 performs better than embedding lua/js or running wasm in the browser.
